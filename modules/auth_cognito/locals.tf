@@ -12,7 +12,7 @@ locals {
 
   # Cognito issues JWTs from this URL. The API Gateway JWT authorizer uses it
   # to verify token signatures.
-  user_pool_issuer_url = "https://cognito-idp.${data.aws_region.current.name}.amazonaws.com/${aws_cognito_user_pool.main.id}"
+  user_pool_issuer_url = "https://cognito-idp.${data.aws_region.current.region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
 }
 
 data "aws_region" "current" {}

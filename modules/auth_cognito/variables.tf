@@ -153,8 +153,8 @@ variable "mfa_configuration" {
     - OPTIONAL: users may enrol but it is not required.
     - ON: all users must configure MFA (recommended for prod).
   EOT
-  type    = string
-  default = "OFF"
+  type        = string
+  default     = "OFF"
 
   validation {
     condition     = contains(["OFF", "OPTIONAL", "ON"], var.mfa_configuration)
@@ -168,8 +168,8 @@ variable "admin_only_user_creation" {
     Set to false (default) to allow open registration in dev and stage.
     Consider setting to true in prod if access is invite-only.
   EOT
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "enable_hosted_ui" {
@@ -178,8 +178,8 @@ variable "enable_hosted_ui" {
       https://<prefix>.auth.<region>.amazoncognito.com
     Requires hosted_ui_domain_suffix to be unique across all AWS accounts.
   EOT
-  type    = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "hosted_ui_domain_suffix" {
@@ -189,8 +189,8 @@ variable "hosted_ui_domain_suffix" {
     Example suffix: "a1b2" produces "private-resources-hub-dev-a1b2.auth...".
     Required when enable_hosted_ui = true; ignored otherwise.
   EOT
-  type    = string
-  default = ""
+  type        = string
+  default     = ""
 }
 
 variable "tags" {

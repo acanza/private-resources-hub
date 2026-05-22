@@ -23,7 +23,7 @@ output "user_pool_issuer_url" {
     to verify token signatures.
     Format: https://cognito-idp.<region>.amazonaws.com/<user_pool_id>
   EOT
-  value = local.user_pool_issuer_url
+  value       = local.user_pool_issuer_url
 }
 
 output "hosted_ui_domain" {
@@ -31,5 +31,5 @@ output "hosted_ui_domain" {
     Full Cognito hosted UI domain (e.g. https://<prefix>.auth.<region>.amazoncognito.com).
     Empty string when enable_hosted_ui = false.
   EOT
-  value = var.enable_hosted_ui ? "https://${aws_cognito_user_pool_domain.hosted_ui[0].domain}.auth.${data.aws_region.current.name}.amazoncognito.com" : ""
+  value       = var.enable_hosted_ui ? "https://${aws_cognito_user_pool_domain.hosted_ui[0].domain}.auth.${data.aws_region.current.region}.amazoncognito.com" : ""
 }
