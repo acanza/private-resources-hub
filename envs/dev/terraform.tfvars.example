@@ -26,3 +26,35 @@ frontend_domain_aliases = []
 tags = {
   Owner = "your-name"
 }
+
+# ------------------------------------------------------------------------------
+# auth_cognito
+# ------------------------------------------------------------------------------
+
+# Allowed redirect URL after login. Use localhost for local development.
+# Must be HTTPS in stage and prod.
+cognito_callback_urls = ["http://localhost:3000/callback"]
+cognito_logout_urls   = ["http://localhost:3000"]
+
+# OAuth flows and scopes. Code flow with PKCE is recommended for SPAs.
+cognito_allowed_oauth_flows  = ["code"]
+cognito_allowed_oauth_scopes = ["openid", "email"]
+
+# Password policy.
+cognito_password_minimum_length = 12
+
+# Token validity.
+cognito_access_token_validity_hours = 1
+cognito_id_token_validity_hours     = 1
+cognito_refresh_token_validity_days = 30
+
+# MFA: OFF for dev. Use OPTIONAL or ON for prod.
+cognito_mfa_configuration = "OFF"
+
+# Set to true to disable self sign-up (invite-only environments).
+cognito_admin_only_user_creation = false
+
+# Hosted UI: disabled by default. Set to true and provide a unique suffix to enable.
+cognito_enable_hosted_ui        = false
+cognito_hosted_ui_domain_suffix = ""
+# cognito_hosted_ui_domain_suffix = "a1b2"  # must be globally unique

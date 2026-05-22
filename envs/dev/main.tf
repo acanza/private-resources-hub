@@ -31,12 +31,30 @@ module "frontend_delivery" {
 # Uncomment each block as the corresponding module under modules/ is built.
 # ------------------------------------------------------------------------------
 
-# module "auth_cognito" {
-#   source       = "../../modules/auth_cognito"
-#   project_name = var.project_name
-#   environment  = var.environment
-#   tags         = var.tags
-# }
+module "auth_cognito" {
+  source = "../../modules/auth_cognito"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  callback_urls = var.cognito_callback_urls
+  logout_urls   = var.cognito_logout_urls
+
+  allowed_oauth_flows  = var.cognito_allowed_oauth_flows
+  allowed_oauth_scopes = var.cognito_allowed_oauth_scopes
+
+  password_minimum_length     = var.cognito_password_minimum_length
+  access_token_validity_hours = var.cognito_access_token_validity_hours
+  id_token_validity_hours     = var.cognito_id_token_validity_hours
+  refresh_token_validity_days = var.cognito_refresh_token_validity_days
+
+  mfa_configuration        = var.cognito_mfa_configuration
+  admin_only_user_creation = var.cognito_admin_only_user_creation
+  enable_hosted_ui         = var.cognito_enable_hosted_ui
+  hosted_ui_domain_suffix  = var.cognito_hosted_ui_domain_suffix
+
+  tags = var.tags
+}
 
 # module "data_dynamodb" {
 #   source       = "../../modules/data_dynamodb"

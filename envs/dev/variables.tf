@@ -78,3 +78,79 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+# ------------------------------------------------------------------------------
+# auth_cognito inputs
+# ------------------------------------------------------------------------------
+
+variable "cognito_callback_urls" {
+  description = "Allowed redirect URLs after Cognito login. In dev, localhost is acceptable."
+  type        = list(string)
+  default     = ["http://localhost:3000/callback"]
+}
+
+variable "cognito_logout_urls" {
+  description = "Allowed redirect URLs after Cognito logout."
+  type        = list(string)
+  default     = ["http://localhost:3000"]
+}
+
+variable "cognito_allowed_oauth_flows" {
+  description = "OAuth 2.0 grant types for the app client. Default: Authorization Code only."
+  type        = list(string)
+  default     = ["code"]
+}
+
+variable "cognito_allowed_oauth_scopes" {
+  description = "OAuth scopes the app client may request."
+  type        = list(string)
+  default     = ["openid", "email"]
+}
+
+variable "cognito_password_minimum_length" {
+  description = "Minimum password length for user accounts."
+  type        = number
+  default     = 12
+}
+
+variable "cognito_access_token_validity_hours" {
+  description = "Access token lifetime in hours."
+  type        = number
+  default     = 1
+}
+
+variable "cognito_id_token_validity_hours" {
+  description = "ID token lifetime in hours."
+  type        = number
+  default     = 1
+}
+
+variable "cognito_refresh_token_validity_days" {
+  description = "Refresh token lifetime in days."
+  type        = number
+  default     = 30
+}
+
+variable "cognito_mfa_configuration" {
+  description = "MFA enforcement level: OFF, OPTIONAL, or ON."
+  type        = string
+  default     = "OFF"
+}
+
+variable "cognito_admin_only_user_creation" {
+  description = "When true, self sign-up is disabled. Default false for dev."
+  type        = bool
+  default     = false
+}
+
+variable "cognito_enable_hosted_ui" {
+  description = "When true, provisions a Cognito-managed hosted login UI domain."
+  type        = bool
+  default     = false
+}
+
+variable "cognito_hosted_ui_domain_suffix" {
+  description = "Short unique suffix for the hosted UI domain prefix. Required when cognito_enable_hosted_ui = true."
+  type        = string
+  default     = ""
+}
