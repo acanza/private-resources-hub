@@ -8,17 +8,15 @@ terraform {
     }
   }
 
-  # Remote state stored in S3 with DynamoDB locking.
-  # Prerequisites before running terraform init:
-  #   1. Create an S3 bucket for state storage (versioning and encryption recommended).
-  #   2. Create a DynamoDB table with a string partition key named "LockID".
-  #   3. Replace the placeholder values below with the actual bucket and table names.
+  # Remote state stored in S3.
+  # Prerequisite before running terraform init:
+  #   Create an S3 bucket for state storage and replace the placeholder below.
+  #   Versioning is recommended to allow recovery of previous states.
   backend "s3" {
-    bucket         = "REPLACE_WITH_STATE_BUCKET_NAME"
-    key            = "envs/dev/terraform.tfstate"
-    region         = "us-east-1"
-    encrypt        = true
-    dynamodb_table = "REPLACE_WITH_LOCK_TABLE_NAME"
+    bucket  = "private-resources-hub-tfstate"
+    key     = "envs/dev/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true
   }
 }
 
