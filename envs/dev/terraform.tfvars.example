@@ -1,0 +1,28 @@
+# ------------------------------------------------------------------------------
+# terraform.tfvars.example
+#
+# Copy this file to terraform.tfvars and fill in your values before running
+# terraform init / plan / apply.
+#
+# terraform.tfvars is excluded from version control via .gitignore.
+# This example file is safe to commit.
+# ------------------------------------------------------------------------------
+
+project_name = "private-resources-hub"
+environment  = "dev"
+aws_region   = "us-east-1"
+
+# PriceClass_100 covers US, Canada, and Europe — lowest cost, suitable for dev.
+price_class = "PriceClass_100"
+
+# Leave empty in dev to use the default *.cloudfront.net domain.
+frontend_domain_aliases = []
+
+# Set only when frontend_domain_aliases is non-empty.
+# The certificate must exist in us-east-1 (CloudFront requirement).
+# acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+
+# Optional additional tags. Project, Environment, and ManagedBy are set automatically.
+tags = {
+  Owner = "your-name"
+}
