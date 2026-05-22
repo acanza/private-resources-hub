@@ -1,0 +1,189 @@
+# Terraform Pre-Plan Validation Report
+
+**Generated**: $(date --iso-8601=seconds)  
+**Target**: `{{ target_path }}`  
+**Status**: {% if critical > 0 %}🔴 BLOCKED{% elsif high > 0 %}🟠 REVIEW REQUIRED{% elsif medium > 0 %}🟡 WARNINGS{% else %}🟢 APPROVED{% endif %}
+
+---
+
+## 1️⃣ Structural Issues
+
+**Status**: {% if structural_pass %}✅ PASS{% else %}⚠️ ISSUES{% endif %}
+
+### Repository Organization
+- **Project Root**: {{ project_root }}
+- **Current Location**: {{ current_location }}
+- **Recommended Placement**: {{ recommended_placement }}
+
+### Terraform Files Present
+- ✅/❌ `terraform.tf` (version constraints)
+- ✅/❌ `variables.tf` (input variables)
+- ✅/❌ `outputs.tf` (outputs)
+- ✅/❌ `locals.tf` (DRY values)
+- ✅/❌ `main.tf` (resources)
+
+### Structure Recommendations
+{{ structure_recommendations }}
+
+---
+
+## 2️⃣ Safety Issues
+
+**Status**: {% if safety_pass %}✅ PASS{% else %}⚠️ ISSUES{% endif %}
+
+### Hardcoded Values
+
+#### 🔴 CRITICAL
+{{ hardcodes_critical }}
+
+#### 🟠 HIGH
+{{ hardcodes_high }}
+
+#### 🟡 MEDIUM
+{{ hardcodes_medium }}
+
+### Version Constraints
+
+- **Required Terraform Version**: {{ terraform_version }}
+  - ✅/❌ Version pinned (>=1.5, <2.0 recommended)
+  
+- **AWS Provider Version**: {{ aws_provider_version }}
+  - ✅/❌ Provider pinned (~> 5.0 recommended)
+
+- **Module Versions**: {{ module_versions }}
+  - ✅/❌ All module sources pinned
+
+---
+
+## 3️⃣ Validation Status
+
+**Status**: {% if validation_pass %}✅ PASS{% else %}❌ FAILED{% endif %}
+
+### terraform fmt
+```
+{{ fmt_output }}
+```
+- ✅/❌ Code formatting valid
+
+### terraform validate
+```
+{{ validate_output }}
+```
+- ✅/❌ Configuration valid
+
+### tflint
+```
+{{ tflint_output }}
+```
+- ✅/❌ Linting passed (if enabled)
+
+### Naming Convention
+- **Variables**: ✅/❌ `snake_case` consistent
+- **Outputs**: ✅/❌ `snake_case` consistent
+- **Resources Tags**: ✅/❌ Using `var.default_tags` or `default_tags` block
+
+---
+
+## 4️⃣ Possible Plan Risks
+
+**Status**: {% if plan_pass %}✅ NO RISKS{% else %}⚠️ RISKS DETECTED{% endif %}
+
+### Resource Replacements
+- ✅/❌ **Engine Changes**: No hardcoded engine/version (forces replacement)
+- ✅/❌ **Identifiers**: No timestamp-based names
+- ✅/❌ **Network Config**: No hardcoded AZ/VPC/CIDR (forces replacement)
+- ✅/❌ **Lifecycle Protection**: Has `create_before_destroy` where needed
+
+### Destructive Changes
+- ✅/❌ No parameter group modifications without lifecycle rules
+- ✅/❌ No prevent_destroy violations on production data
+- ✅/❌ RDS, S3, ElastiCache protected appropriately
+
+### High-Risk Resources Detected
+{{ risky_resources }}
+
+### Suggested terraform plan Review Points
+```bash
+# Run to see actual plan
+terraform plan -out=tfplan
+
+# Search for:
+# - "must replace"
+# - "destroy before create"
+# - "update in place" (safe)
+```
+
+---
+
+## 5️⃣ Next Recommended Action
+
+### ✅ If all green (PASS status):
+```bash
+terraform plan -out=tfplan
+terraform apply tfplan
+```
+
+### 🟡 If warnings (MEDIUM issues):
+1. Review warnings above carefully
+2. Verify with `terraform plan -out=tfplan`
+3. Search output for `must replace` on critical resources
+4. If safe, proceed: `terraform apply tfplan`
+
+### 🟠 If high-risk (HIGH issues):
+1. **DO NOT PROCEED** without explicit review
+2. Address hardcodes and version constraints
+3. Verify replacement risks:
+   ```bash
+   terraform plan -out=tfplan | grep "must replace"
+   ```
+4. Consult with infrastructure team
+5. Run `pre-plan-validation` again before plan
+
+### 🔴 If critical (CRITICAL issues):
+**BLOCKED** - Cannot proceed to plan until resolved:
+1. **Passwords/secrets detected**: Redact immediately, use AWS Secrets Manager
+2. **Access keys found**: Rotate keys, use IAM roles
+3. **VPC changes**: Verify intentional, ensure no downtime
+4. **Database replacement**: Review carefully, may lose data
+
+Fix issues, then re-run:
+```bash
+./structure-detector.sh {{ target_path }}
+./detect-hardcodes.sh {{ target_path }}
+./replacement-detector.sh {{ target_path }}
+```
+
+---
+
+## Summary Table
+
+| Category | Items | Status |
+|----------|-------|--------|
+| **Structural** | {{ struct_count }} | {% if structural_pass %}✅{% else %}❌{% endif %} |
+| **Safety** | {{ safety_count }} | {% if safety_pass %}✅{% else %}❌{% endif %} |
+| **Validation** | {{ validation_count }} | {% if validation_pass %}✅{% else %}❌{% endif %} |
+| **Plan Risk** | {{ risk_count }} | {% if plan_pass %}✅{% else %}⚠️{% endif %} |
+| **Overall** | — | {% if all_pass %}🟢 APPROVED{% elsif critical > 0 %}🔴 BLOCKED{% elsif high > 0 %}🟠 REVIEW{% else %}🟡 WARNINGS{% endif %} |
+
+---
+
+## Approval Checklist
+
+**For PR reviewers**: Before approving terraform changes, verify:
+
+- [ ] All structural issues resolved
+- [ ] No CRITICAL or HIGH hardcoded values
+- [ ] Version constraints pinned correctly
+- [ ] Naming conventions consistent
+- [ ] terraform plan reviewed for replacement risks
+- [ ] High-risk resources (DB, storage) protected with lifecycle rules
+- [ ] All approvals from infrastructure team
+
+**Approver**: ________________  
+**Date**: ________________  
+**Comments**: 
+
+---
+
+*This report was generated by `pre-plan-validation` skill*  
+*Reference: `/Volumes/STOREROOM/☁️ AWS Certified SAA/Projects/aws-terraform-simple-ecommerce/.github/skills/pre-plan-validation/*
