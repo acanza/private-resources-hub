@@ -154,3 +154,21 @@ variable "cognito_hosted_ui_domain_suffix" {
   type        = string
   default     = ""
 }
+
+# ------------------------------------------------------------------------------
+# backend_iam inputs
+# ------------------------------------------------------------------------------
+
+variable "cloudfront_private_key_secret_arn" {
+  description = <<-EOT
+    ARN of the Secrets Manager secret that stores the RSA private key used by
+    the backend Lambda to generate CloudFront signed URLs and cookies.
+    Created manually before terraform apply — never stored in source control.
+  EOT
+  type        = string
+
+  validation {
+    condition     = can(regex("^arn:aws:secretsmanager:", var.cloudfront_private_key_secret_arn))
+    error_message = "cloudfront_private_key_secret_arn must be a valid Secrets Manager secret ARN."
+  }
+}

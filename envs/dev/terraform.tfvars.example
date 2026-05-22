@@ -58,3 +58,15 @@ cognito_admin_only_user_creation = false
 cognito_enable_hosted_ui        = false
 cognito_hosted_ui_domain_suffix = ""
 # cognito_hosted_ui_domain_suffix = "a1b2"  # must be globally unique
+
+# ------------------------------------------------------------------------------
+# backend_iam
+# ------------------------------------------------------------------------------
+
+# ARN of the Secrets Manager secret holding the CloudFront RSA private key.
+# Create the secret manually before running terraform apply:
+#   openssl genrsa -out private_key.pem 2048
+#   aws secretsmanager create-secret --name "prh/dev/cloudfront-private-key" \
+#     --secret-string file://private_key.pem
+# Then copy the returned ARN here.
+cloudfront_private_key_secret_arn = "arn:aws:secretsmanager:<region>:<account-id>:secret:prh/dev/cloudfront-private-key-<suffix>"
