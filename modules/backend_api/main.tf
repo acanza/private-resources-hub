@@ -176,6 +176,20 @@ resource "aws_apigatewayv2_stage" "default" {
 
   access_log_settings {
     destination_arn = aws_cloudwatch_log_group.api_gateway.arn
+
+    # Structured JSON format for easier CloudWatch Insights queries.
+    format = jsonencode({
+      requestId          = "$context.requestId"
+      routeKey           = "$context.routeKey"
+      status             = "$context.status"
+      protocol           = "$context.protocol"
+      requestTime        = "$context.requestTime"
+      sourceIp           = "$context.identity.sourceIp"
+      responseLength     = "$context.responseLength"
+      integrationLatency = "$context.integrationLatency"
+      responseLatency    = "$context.responseLatency"
+      errorMessage       = "$context.error.message"
+    })
   }
 
   tags = var.tags

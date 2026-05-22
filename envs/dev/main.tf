@@ -26,11 +26,6 @@ module "frontend_delivery" {
   tags                    = var.tags
 }
 
-# ------------------------------------------------------------------------------
-# Modules below are not yet implemented.
-# Uncomment each block as the corresponding module under modules/ is built.
-# ------------------------------------------------------------------------------
-
 module "auth_cognito" {
   source = "../../modules/auth_cognito"
 
@@ -56,37 +51,83 @@ module "auth_cognito" {
   tags = var.tags
 }
 
-# module "data_dynamodb" {
-#   source       = "../../modules/data_dynamodb"
-#   project_name = var.project_name
-#   environment  = var.environment
-#   tags         = var.tags
-# }
+# ------------------------------------------------------------------------------
+# Module: data_dynamodb
+#
+# Single-table DynamoDB table for resource metadata and user access records.
+# ------------------------------------------------------------------------------
 
-# module "private_content_delivery" {
-#   source       = "../../modules/private_content_delivery"
-#   project_name = var.project_name
-#   environment  = var.environment
-#   tags         = var.tags
-# }
+module "data_dynamodb" {
+  source = "../../modules/data_dynamodb"
 
-# module "backend_iam" {
-#   source                  = "../../modules/backend_iam"
-#   project_name            = var.project_name
-#   environment             = var.environment
-#   dynamodb_table_arn      = module.data_dynamodb.table_arn
-#   private_distribution_id = module.private_content_delivery.private_distribution_id
-#   tags                    = var.tags
-# }
+  project_name = var.project_name
+  environment  = var.environment
+  tags         = var.tags
+}
 
-# module "backend_api" {
-#   source                           = "../../modules/backend_api"
-#   project_name                     = var.project_name
-#   environment                      = var.environment
-#   lambda_role_arn                  = module.backend_iam.lambda_role_arn
-#   cognito_user_pool_issuer_url     = module.auth_cognito.user_pool_issuer_url
-#   cognito_user_pool_client_id      = module.auth_cognito.user_pool_client_id
-#   dynamodb_table_name              = module.data_dynamodb.table_name
-#   private_distribution_domain_name = module.private_content_delivery.private_distribution_domain_name
-#   tags                             = var.tags
-# }
+# ------------------------------------------------------------------------------
+# Module: private_content_delivery
+#
+# Private S3 bucket + CloudFront distribution for signed-URL-protected content.
+# The public key is registered with CloudFront; the private key lives in
+# Secrets Manager (see cloudfront_private_key_secret_arn).
+# ------------------------------------------------------------------------------
+
+module "private_content_delivery" {
+  source = "../../modules/private_content_delivery"
+
+  project_name              = var.project_name
+  environment               = var.environment
+  cloudfront_public_key_pem = var.cloudfront_public_key_pem
+  price_class               = var.price_class
+  tags                      = var.tags
+}
+
+# ------------------------------------------------------------------------------
+# Module: backend_iam
+#
+# IAM execution role for the backend Lambda with least-privilege policies
+# scoped to DynamoDB, CloudWatch Logs, and the signing key secret.
+# ------------------------------------------------------------------------------
+
+module "backend_iam" {
+  source = "../../modules/backend_iam"
+
+  project_name            = var.project_name
+  environment             = var.environment
+  dynamodb_table_arn      = module.data_dynamodb.table_arn
+  private_distribution_id = module.private_content_delivery.private_distribution_id
+  private_key_secret_arn  = var.cloudfront_private_key_secret_arn
+  tags                    = var.tags
+}
+
+# ------------------------------------------------------------------------------
+# Module: backend_api
+#
+# Lambda function + API Gateway HTTP API with Cognito JWT authorizer.
+# Receives cross-module outputs as inputs to avoid hidden data lookups.
+# ------------------------------------------------------------------------------
+
+module "backend_api" {
+  source = "../../modules/backend_api"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  lambda_role_arn  = module.backend_iam.lambda_role_arn
+  lambda_s3_bucket = var.lambda_s3_bucket
+  lambda_s3_key    = var.lambda_s3_key
+
+  cognito_user_pool_issuer_url = module.auth_cognito.user_pool_issuer_url
+  cognito_user_pool_client_id  = module.auth_cognito.user_pool_client_id
+
+  cors_allowed_origins = var.cors_allowed_origins
+
+  dynamodb_table_name              = module.data_dynamodb.table_name
+  private_distribution_domain_name = module.private_content_delivery.private_distribution_domain_name
+  cloudfront_public_key_id         = module.private_content_delivery.cloudfront_public_key_id
+
+  log_retention_days = var.log_retention_days
+
+  tags = var.tags
+}

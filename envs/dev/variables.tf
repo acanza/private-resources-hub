@@ -172,3 +172,51 @@ variable "cloudfront_private_key_secret_arn" {
     error_message = "cloudfront_private_key_secret_arn must be a valid Secrets Manager secret ARN."
   }
 }
+
+# ------------------------------------------------------------------------------
+# private_content_delivery inputs
+# ------------------------------------------------------------------------------
+
+variable "cloudfront_public_key_pem" {
+  description = <<-EOT
+    PEM-encoded RSA public key for CloudFront signed URL / cookie verification.
+    Generate with: openssl rsa -pubout -in private_key.pem -out public_key.pem
+    The corresponding private key must be stored in Secrets Manager.
+  EOT
+  type        = string
+
+  validation {
+    condition     = can(regex("^-----BEGIN PUBLIC KEY-----", var.cloudfront_public_key_pem))
+    error_message = "cloudfront_public_key_pem must be a PEM-encoded public key."
+  }
+}
+
+# ------------------------------------------------------------------------------
+# backend_api inputs
+# ------------------------------------------------------------------------------
+
+variable "lambda_s3_bucket" {
+  description = "Name of the S3 bucket containing the Lambda deployment package (zip)."
+  type        = string
+}
+
+variable "lambda_s3_key" {
+  description = "S3 key (path) to the Lambda zip file inside lambda_s3_bucket."
+  type        = string
+}
+
+variable "cors_allowed_origins" {
+  description = <<-EOT
+    List of origins allowed to call the API from a browser.
+    Include the frontend CloudFront domain and localhost for dev.
+    Example: ["https://d111abcdef.cloudfront.net", "http://localhost:3000"]
+  EOT
+  type        = list(string)
+  default     = ["http://localhost:3000"]
+}
+
+variable "log_retention_days" {
+  description = "CloudWatch Logs retention period in days for Lambda and API Gateway log groups."
+  type        = number
+  default     = 7
+}
