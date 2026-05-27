@@ -50,6 +50,11 @@ output "dynamodb_table_arn" {
 
 # private_content_delivery outputs
 
+output "private_bucket_name" {
+  description = "Name of the S3 bucket storing private content. Used to upload test fixtures."
+  value       = module.private_content_delivery.private_bucket_name
+}
+
 output "private_distribution_domain_name" {
   description = "Domain name of the private CloudFront distribution. Used to construct signed URL base paths."
   value       = module.private_content_delivery.private_distribution_domain_name
