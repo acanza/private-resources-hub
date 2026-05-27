@@ -13,9 +13,9 @@ terraform {
   #   Create an S3 bucket for state storage and replace the placeholder below.
   #   Versioning is recommended to allow recovery of previous states.
   backend "s3" {
-    bucket  = "private-resources-hub-tfstate"
+    bucket  = "private-resources-hub-project-tfstate"
     key     = "envs/dev/terraform.tfstate"
-    region  = "us-east-1"
+    region  = "eu-west-3"
     encrypt = true
   }
 }
