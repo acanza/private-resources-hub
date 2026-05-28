@@ -117,6 +117,7 @@ module "backend_api" {
   lambda_role_arn  = module.backend_iam.lambda_role_arn
   lambda_s3_bucket = var.lambda_s3_bucket
   lambda_s3_key    = var.lambda_s3_key
+  lambda_handler   = "src.main.handler"
 
   cognito_user_pool_issuer_url = module.auth_cognito.user_pool_issuer_url
   cognito_user_pool_client_id  = module.auth_cognito.user_pool_client_id
