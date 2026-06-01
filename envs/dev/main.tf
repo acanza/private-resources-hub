@@ -125,6 +125,7 @@ module "backend_api" {
   cors_allowed_origins = var.cors_allowed_origins
 
   dynamodb_table_name              = module.data_dynamodb.table_name
+  s3_private_bucket_name           = module.private_content_delivery.private_bucket_name
   private_distribution_domain_name = module.private_content_delivery.private_distribution_domain_name
   cloudfront_public_key_id         = module.private_content_delivery.cloudfront_public_key_id
 
