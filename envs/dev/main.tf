@@ -80,6 +80,7 @@ module "private_content_delivery" {
   environment               = var.environment
   cloudfront_public_key_pem = var.cloudfront_public_key_pem
   price_class               = var.price_class
+  folder_prefixes           = var.private_content_folder_prefixes
   tags                      = var.tags
 }
 

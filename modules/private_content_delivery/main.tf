@@ -179,3 +179,19 @@ resource "aws_cloudfront_distribution" "private_content" {
 
   depends_on = [aws_s3_bucket_public_access_block.private_content]
 }
+
+# ------------------------------------------------------------------------------
+# S3 Folder Prefixes — optional, environment-driven content categories
+#
+# Each entry in var.folder_prefixes becomes a zero-byte object with a trailing
+# "/", which is the S3 convention for folder placeholders. Using for_each means
+# individual prefixes can be added or removed without affecting the others.
+# ------------------------------------------------------------------------------
+
+resource "aws_s3_object" "folder" {
+  for_each = toset(var.folder_prefixes)
+
+  bucket  = aws_s3_bucket.private_content.id
+  key     = "${each.key}/"
+  content = ""
+}

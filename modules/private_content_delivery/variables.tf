@@ -88,3 +88,18 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "folder_prefixes" {
+  description = <<-EOT
+    List of logical folder prefixes to create inside the private content bucket.
+    Each entry becomes a zero-byte S3 object with a trailing "/" (e.g. "tech" → "tech/").
+    Leave empty to skip folder creation and manage the bucket contents externally.
+  EOT
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition     = alltrue([for p in var.folder_prefixes : can(regex("^[a-z0-9][a-z0-9-]*$", p))])
+    error_message = "Each folder prefix must contain only lowercase letters, numbers, and hyphens, and must not start with a hyphen."
+  }
+}

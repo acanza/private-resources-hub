@@ -177,6 +177,16 @@ variable "cloudfront_private_key_secret_arn" {
 # private_content_delivery inputs
 # ------------------------------------------------------------------------------
 
+variable "private_content_folder_prefixes" {
+  description = <<-EOT
+    List of top-level folder prefixes to create in the private content S3 bucket.
+    Each entry becomes a zero-byte placeholder object (e.g. "tech" → "tech/").
+    Used to organise private assets by department or category.
+  EOT
+  type        = list(string)
+  default     = []
+}
+
 variable "cloudfront_public_key_pem" {
   description = <<-EOT
     PEM-encoded RSA public key for CloudFront signed URL / cookie verification.
