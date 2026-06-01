@@ -134,6 +134,14 @@ variable "dynamodb_table_name" {
   type        = string
 }
 
+variable "s3_private_bucket_name" {
+  description = <<-EOT
+    Name of the S3 bucket that holds the private hub resources.
+    Injected into Lambda as S3_BUCKET_NAME so it can read and serve private content.
+  EOT
+  type        = string
+}
+
 variable "private_distribution_domain_name" {
   description = <<-EOT
     Domain name of the private CloudFront distribution.
