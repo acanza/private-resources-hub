@@ -129,6 +129,7 @@ module "backend_api" {
   s3_private_bucket_name           = module.private_content_delivery.private_bucket_name
   private_distribution_domain_name = module.private_content_delivery.private_distribution_domain_name
   cloudfront_public_key_id         = module.private_content_delivery.cloudfront_public_key_id
+  cloudfront_secret_name           = var.cloudfront_private_key_secret_name
 
   log_retention_days = var.log_retention_days
 

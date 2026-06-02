@@ -173,6 +173,21 @@ variable "cloudfront_private_key_secret_arn" {
   }
 }
 
+variable "cloudfront_private_key_secret_name" {
+  description = <<-EOT
+    Name of the Secrets Manager secret that stores the RSA private key used by
+    the backend Lambda to sign CloudFront cookies.
+    Must match the secret name used when the secret was created.
+    Example: prh/dev/cloudfront-private-key
+  EOT
+  type        = string
+
+  validation {
+    condition     = length(var.cloudfront_private_key_secret_name) > 0
+    error_message = "cloudfront_private_key_secret_name must not be empty."
+  }
+}
+
 # ------------------------------------------------------------------------------
 # private_content_delivery inputs
 # ------------------------------------------------------------------------------

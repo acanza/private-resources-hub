@@ -160,6 +160,21 @@ variable "cloudfront_public_key_id" {
   type        = string
 }
 
+variable "cloudfront_secret_name" {
+  description = <<-EOT
+    Name of the Secrets Manager secret that stores the RSA private key used to
+    sign CloudFront cookies. Injected into Lambda as CLOUDFRONT_SECRET_NAME so
+    it can retrieve the key at runtime and generate signed tokens.
+    Example: prh/dev/cloudfront-private-key
+  EOT
+  type        = string
+
+  validation {
+    condition     = length(var.cloudfront_secret_name) > 0
+    error_message = "cloudfront_secret_name must not be empty."
+  }
+}
+
 # ------------------------------------------------------------------------------
 # Observability
 # ------------------------------------------------------------------------------

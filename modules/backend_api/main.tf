@@ -60,6 +60,7 @@ resource "aws_lambda_function" "backend" {
       DYNAMODB_TABLE_NAME              = var.dynamodb_table_name
       PRIVATE_DISTRIBUTION_DOMAIN_NAME = var.private_distribution_domain_name
       CLOUDFRONT_KEY_PAIR_ID           = var.cloudfront_public_key_id
+      CLOUDFRONT_SECRET_NAME           = var.cloudfront_secret_name
       S3_BUCKET_NAME                   = var.s3_private_bucket_name
     }
   }
