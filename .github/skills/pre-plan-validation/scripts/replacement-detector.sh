@@ -36,14 +36,29 @@ echo ""
 DESTRUCTIVE_RESOURCES=('aws_db_instance' 'aws_elasticache_cluster' 'aws_rds_cluster' 'aws_s3_bucket')
 
 for RESOURCE in "${DESTRUCTIVE_RESOURCES[@]}"; do
-  IDENTIFIER_CHANGES=$(grep -rn "resource \"$RESOURCE\"" --include="*.tf" | wc -l)
+  IDENTIFIER_CHANGES=$(grep -rn \
+    --include="*.tf" \
+    --exclude-dir=".github" \
+    -- "resource \"$RESOURCE\"" . | wc -l | tr -d ' ')
+
+  echo -e "${MAGENTA}→${NC} Scanning $RESOURCE for identifier changes..."
+
   if [[ "$IDENTIFIER_CHANGES" -gt 0 ]]; then
-    # Check if identifier is using timestamp or local value
-    if grep -A20 "resource \"$RESOURCE\"" --include="*.tf" | grep -q 'identifier\s*=\|name\s*='; then
+    if grep -R -A20 \
+      --include="*.tf" \
+      --exclude-dir=".github" \
+      -- "resource \"$RESOURCE\"" . \
+      | grep -Eq 'identifier[[:space:]]*=|name[[:space:]]*=|bucket[[:space:]]*='; then
+
       echo -e "${MAGENTA}→${NC} Checking $RESOURCE identifier mutations..."
-      
-      if grep -A20 "resource \"$RESOURCE\"" --include="*.tf" | grep -q 'timestamp()\|format(".*%s"'; then
-        echo -e "  ${RED}[CRITICAL]${NC} $RESOURCE identifier uses timestamp/function (recreates on every apply!)"
+
+      if grep -R -A20 \
+        --include="*.tf" \
+        --exclude-dir=".github" \
+        -- "resource \"$RESOURCE\"" . \
+        | grep -Eq '(identifier|name|bucket)[[:space:]]*=.*(timestamp\(\)|format\(".*%s")'; then
+
+        echo -e "  ${RED}[CRITICAL]${NC} $RESOURCE identifier/name/bucket uses timestamp/function (recreates on every apply!)"
         CRITICAL=$((CRITICAL + 1))
       fi
     fi
