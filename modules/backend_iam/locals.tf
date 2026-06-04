@@ -7,7 +7,7 @@ locals {
   policy_logs_name     = "${var.project_name}-${var.environment}-lambda-logs-policy"
   policy_dynamodb_name = "${var.project_name}-${var.environment}-lambda-dynamodb-policy"
   policy_secrets_name  = "${var.project_name}-${var.environment}-lambda-secrets-policy"
-  policy_s3_name       = "${var.project_name}-${var.environment}-lambda-s3-policy"
+  policy_s3_list_name  = "${var.project_name}-${var.environment}-lambda-s3-list-policy"
 
   # CloudWatch log group prefix for this environment's Lambda functions.
   # Scoping the logs policy to this prefix avoids granting write access to
