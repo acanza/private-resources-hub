@@ -202,7 +202,7 @@ echo -e "${BLUE}📝 Naming Conventions${NC}"
 echo ""
 
 # Check variable naming style
-VARS=$(grep "^variable \"" variables.tf 2>/dev/null | grep -oP '"[^"]+' | tr -d '"' | head -5)
+VARS=$(grep "^variable \"" variables.tf 2>/dev/null | sed -E 's/^variable "([^"]+).*/\1/' | head -5)
 if [[ -n "$VARS" ]]; then
   echo "Sample variables:"
   echo "$VARS" | while read -r var; do

@@ -27,7 +27,7 @@ variable "environment" {
 variable "aws_region" {
   description = "AWS region where resources are deployed."
   type        = string
-  default     = "us-east-1"
+  default     = "eu-west-3"
 }
 
 variable "price_class" {
@@ -153,4 +153,95 @@ variable "cognito_hosted_ui_domain_suffix" {
   description = "Short unique suffix for the hosted UI domain prefix. Required when cognito_enable_hosted_ui = true."
   type        = string
   default     = ""
+}
+
+# ------------------------------------------------------------------------------
+# backend_iam inputs
+# ------------------------------------------------------------------------------
+
+variable "cloudfront_private_key_secret_arn" {
+  description = <<-EOT
+    ARN of the Secrets Manager secret that stores the RSA private key used by
+    the backend Lambda to generate CloudFront signed URLs and cookies.
+    Created manually before terraform apply — never stored in source control.
+  EOT
+  type        = string
+
+  validation {
+    condition     = can(regex("^arn:aws:secretsmanager:", var.cloudfront_private_key_secret_arn))
+    error_message = "cloudfront_private_key_secret_arn must be a valid Secrets Manager secret ARN."
+  }
+}
+
+variable "cloudfront_private_key_secret_name" {
+  description = <<-EOT
+    Name of the Secrets Manager secret that stores the RSA private key used by
+    the backend Lambda to sign CloudFront cookies.
+    Must match the secret name used when the secret was created.
+    Example: prh/dev/cloudfront-private-key
+  EOT
+  type        = string
+
+  validation {
+    condition     = length(var.cloudfront_private_key_secret_name) > 0
+    error_message = "cloudfront_private_key_secret_name must not be empty."
+  }
+}
+
+# ------------------------------------------------------------------------------
+# private_content_delivery inputs
+# ------------------------------------------------------------------------------
+
+variable "private_content_folder_prefixes" {
+  description = <<-EOT
+    List of top-level folder prefixes to create in the private content S3 bucket.
+    Each entry becomes a zero-byte placeholder object (e.g. "tech" → "tech/").
+    Used to organise private assets by department or category.
+  EOT
+  type        = list(string)
+  default     = []
+}
+
+variable "cloudfront_public_key_pem" {
+  description = <<-EOT
+    PEM-encoded RSA public key for CloudFront signed URL / cookie verification.
+    Generate with: openssl rsa -pubout -in private_key.pem -out public_key.pem
+    The corresponding private key must be stored in Secrets Manager.
+  EOT
+  type        = string
+
+  validation {
+    condition     = can(regex("^-----BEGIN PUBLIC KEY-----", var.cloudfront_public_key_pem))
+    error_message = "cloudfront_public_key_pem must be a PEM-encoded public key."
+  }
+}
+
+# ------------------------------------------------------------------------------
+# backend_api inputs
+# ------------------------------------------------------------------------------
+
+variable "lambda_s3_bucket" {
+  description = "Name of the S3 bucket containing the Lambda deployment package (zip)."
+  type        = string
+}
+
+variable "lambda_s3_key" {
+  description = "S3 key (path) to the Lambda zip file inside lambda_s3_bucket."
+  type        = string
+}
+
+variable "cors_allowed_origins" {
+  description = <<-EOT
+    List of origins allowed to call the API from a browser.
+    Include the frontend CloudFront domain and localhost for dev.
+    Example: ["https://d111abcdef.cloudfront.net", "http://localhost:3000"]
+  EOT
+  type        = list(string)
+  default     = ["http://localhost:3000"]
+}
+
+variable "log_retention_days" {
+  description = "CloudWatch Logs retention period in days for Lambda and API Gateway log groups."
+  type        = number
+  default     = 7
 }
