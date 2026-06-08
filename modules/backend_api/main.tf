@@ -62,6 +62,7 @@ resource "aws_lambda_function" "backend" {
       CLOUDFRONT_KEY_PAIR_ID           = var.cloudfront_public_key_id
       CLOUDFRONT_SECRET_NAME           = var.cloudfront_secret_name
       S3_BUCKET_NAME                   = var.s3_private_bucket_name
+      ENVIRONMENT                      = var.environment
     }
   }
 
