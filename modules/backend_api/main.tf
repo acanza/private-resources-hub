@@ -160,17 +160,26 @@ resource "aws_apigatewayv2_route" "default" {
   target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
 }
 
+# HTTP APIs handle CORS preflight (OPTIONS) requests automatically via the
+# cors_configuration on the API resource. No explicit integration or route needed.
+
 # ------------------------------------------------------------------------------
-# CORS Preflight Route — OPTIONS method for all paths
-# CORS preflight requests use the OPTIONS method. This route allows API Gateway
-# to respond to preflight requests without invoking the Lambda, which simplifies CORS handling
-# and reduces unnecessary Lambda invocations. The CORS configuration on the API resource ensures the correct headers are included in responses.
-# The route key "{proxy+}" matches all paths, so this single route handles preflight for the entire API.
+# OPTIONS Route — CORS preflight without authentication
+#
+# CORS preflight requests use the OPTIONS method and do NOT include the 
+# Authorization header. This route allows OPTIONS requests to reach the Lambda
+# without JWT validation. The Lambda function must handle OPTIONS and respond
+# with appropriate CORS headers.
+# 
+# The pattern "OPTIONS /{proxy+}" matches all paths, ensuring preflight works
+# for every endpoint. This route is evaluated before the $default catch-all.
 # ------------------------------------------------------------------------------
+
 resource "aws_apigatewayv2_route" "options" {
   api_id    = aws_apigatewayv2_api.backend.id
   route_key = "OPTIONS /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  # No authorization_type: OPTIONS requests bypass JWT validation
 }
 
 # ------------------------------------------------------------------------------
