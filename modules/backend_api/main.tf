@@ -161,6 +161,19 @@ resource "aws_apigatewayv2_route" "default" {
 }
 
 # ------------------------------------------------------------------------------
+# CORS Preflight Route — OPTIONS method for all paths
+# CORS preflight requests use the OPTIONS method. This route allows API Gateway
+# to respond to preflight requests without invoking the Lambda, which simplifies CORS handling
+# and reduces unnecessary Lambda invocations. The CORS configuration on the API resource ensures the correct headers are included in responses.
+# The route key "{proxy+}" matches all paths, so this single route handles preflight for the entire API.
+# ------------------------------------------------------------------------------
+resource "aws_apigatewayv2_route" "options" {
+  api_id    = aws_apigatewayv2_api.backend.id
+  route_key = "OPTIONS /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+# ------------------------------------------------------------------------------
 # Stage — $default with auto-deploy and access logging
 #
 # The $default stage is the standard single-stage deployment model for HTTP
