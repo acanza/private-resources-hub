@@ -63,6 +63,7 @@ resource "aws_lambda_function" "backend" {
       CLOUDFRONT_SECRET_NAME           = var.cloudfront_secret_name
       S3_BUCKET_NAME                   = var.s3_private_bucket_name
       ENVIRONMENT                      = var.environment
+      ALLOWED_ORIGINS                  = join(",", var.cors_allowed_origins[var.environment])
     }
   }
 
@@ -90,7 +91,7 @@ resource "aws_apigatewayv2_api" "backend" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = var.cors_allowed_origins
+    allow_origins = var.cors_allowed_origins[var.environment]
     allow_methods = ["GET", "POST", "OPTIONS"]
     allow_headers = ["Authorization", "Content-Type"]
     max_age       = 300

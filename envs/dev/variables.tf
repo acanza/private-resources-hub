@@ -234,10 +234,12 @@ variable "cors_allowed_origins" {
   description = <<-EOT
     List of origins allowed to call the API from a browser.
     Include the frontend CloudFront domain and localhost for dev.
-    Example: ["https://d111abcdef.cloudfront.net", "http://localhost:3000"]
+    Example: {"prod":["https://d111abcdef.cloudfront.net"], "dev":["http://localhost:3000"]}
   EOT
-  type        = list(string)
-  default     = ["http://localhost:3000"]
+  type        = map(list(string))
+  default = {
+    dev = ["http://localhost:3000"]
+  }
 }
 
 variable "log_retention_days" {
