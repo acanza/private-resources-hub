@@ -7,6 +7,7 @@ locals {
   policy_logs_name     = "${var.project_name}-${var.environment}-lambda-logs-policy"
   policy_dynamodb_name = "${var.project_name}-${var.environment}-lambda-dynamodb-policy"
   policy_secrets_name  = "${var.project_name}-${var.environment}-lambda-secrets-policy"
+  policy_s3_list_name  = "${var.project_name}-${var.environment}-lambda-s3-list-policy"
 
   # CloudWatch log group prefix for this environment's Lambda functions.
   # Scoping the logs policy to this prefix avoids granting write access to
@@ -82,5 +83,17 @@ data "aws_iam_policy_document" "lambda_secrets" {
 
     # Scoped to the single secret that holds the CloudFront RSA private key.
     resources = [var.private_key_secret_arn]
+  }
+}
+
+data "aws_iam_policy_document" "lambda_s3_list" {
+  statement {
+    sid    = "AllowListS3Bucket"
+    effect = "Allow"
+
+    actions = ["s3:ListBucket"]
+
+    # Scoped to the single bucket that holds the private content.
+    resources = [var.private_content_bucket_arn]
   }
 }

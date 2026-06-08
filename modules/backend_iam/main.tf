@@ -2,11 +2,12 @@
 # Module: backend_iam
 #
 # Defines the IAM execution role for the backend Lambda function and attaches
-# three least-privilege managed policies, one per service concern:
+# four least-privilege managed policies, one per service concern:
 #
 #   1. CloudWatch Logs  — write structured logs from the function.
 #   2. DynamoDB         — read resource access records and metadata.
 #   3. Secrets Manager  — retrieve the RSA private key for CloudFront signing.
+#   4. S3               — list objects in the private content bucket.
 #
 # Policies are kept separate so each can be reviewed, audited, or replaced
 # independently without affecting the others.
@@ -87,4 +88,23 @@ resource "aws_iam_policy" "lambda_secrets" {
 resource "aws_iam_role_policy_attachment" "lambda_secrets" {
   role       = aws_iam_role.lambda.name
   policy_arn = aws_iam_policy.lambda_secrets.arn
+}
+
+# ------------------------------------------------------------------------------
+# Managed Policy 4: List S3 bucket
+# Grants ListBucket on the private content S3 bucket so the Lambda can verify
+# the existence of objects before generating signed URLs. This is a read-only
+# permission scoped to a single bucket ARN.
+# ------------------------------------------------------------------------------
+resource "aws_iam_policy" "lambda_s3_list" {
+  name        = local.policy_s3_list_name
+  description = "Allow ${var.project_name}-${var.environment} Lambda to list the private content S3 bucket."
+  policy      = data.aws_iam_policy_document.lambda_s3_list.json
+
+  tags = var.tags
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_list" {
+  role       = aws_iam_role.lambda.name
+  policy_arn = aws_iam_policy.lambda_s3_list.arn
 }

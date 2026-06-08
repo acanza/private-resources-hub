@@ -58,6 +58,19 @@ variable "private_distribution_id" {
   type        = string
 }
 
+variable "private_content_bucket_arn" {
+  description = <<-EOT
+    ARN of the S3 bucket that holds the private hub resources.
+    Used to scope the S3 list policy to this specific bucket.
+  EOT
+  type        = string
+
+  validation {
+    condition     = can(regex("^arn:aws:s3:::[a-z0-9.-]+$", var.private_content_bucket_arn))
+    error_message = "private_content_bucket_arn must be a valid S3 bucket ARN."
+  }
+}
+
 variable "tags" {
   description = "Map of tags to apply to all taggable resources in this module."
   type        = map(string)

@@ -88,18 +88,19 @@ module "private_content_delivery" {
 # Module: backend_iam
 #
 # IAM execution role for the backend Lambda with least-privilege policies
-# scoped to DynamoDB, CloudWatch Logs, and the signing key secret.
+# scoped to DynamoDB, CloudWatch Logs, the signing key secret, and the private content S3 bucket.
 # ------------------------------------------------------------------------------
 
 module "backend_iam" {
   source = "../../modules/backend_iam"
 
-  project_name            = var.project_name
-  environment             = var.environment
-  dynamodb_table_arn      = module.data_dynamodb.table_arn
-  private_distribution_id = module.private_content_delivery.private_distribution_id
-  private_key_secret_arn  = var.cloudfront_private_key_secret_arn
-  tags                    = var.tags
+  project_name               = var.project_name
+  environment                = var.environment
+  dynamodb_table_arn         = module.data_dynamodb.table_arn
+  private_distribution_id    = module.private_content_delivery.private_distribution_id
+  private_key_secret_arn     = var.cloudfront_private_key_secret_arn
+  private_content_bucket_arn = module.private_content_delivery.private_bucket_arn
+  tags                       = var.tags
 }
 
 # ------------------------------------------------------------------------------
