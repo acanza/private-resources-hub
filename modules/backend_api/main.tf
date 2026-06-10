@@ -62,6 +62,8 @@ resource "aws_lambda_function" "backend" {
       CLOUDFRONT_KEY_PAIR_ID           = var.cloudfront_public_key_id
       CLOUDFRONT_SECRET_NAME           = var.cloudfront_secret_name
       S3_BUCKET_NAME                   = var.s3_private_bucket_name
+      ENVIRONMENT                      = var.environment
+      ALLOWED_ORIGINS                  = var.cors_allowed_origins
     }
   }
 
@@ -89,7 +91,7 @@ resource "aws_apigatewayv2_api" "backend" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = var.cors_allowed_origins
+    allow_origins = jsondecode(var.cors_allowed_origins)
     allow_methods = ["GET", "POST", "OPTIONS"]
     allow_headers = ["Authorization", "Content-Type"]
     max_age       = 300
@@ -158,6 +160,28 @@ resource "aws_apigatewayv2_route" "default" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.jwt.id
   target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+# HTTP APIs handle CORS preflight (OPTIONS) requests automatically via the
+# cors_configuration on the API resource. No explicit integration or route needed.
+
+# ------------------------------------------------------------------------------
+# OPTIONS Route — CORS preflight without authentication
+#
+# CORS preflight requests use the OPTIONS method and do NOT include the 
+# Authorization header. This route allows OPTIONS requests to reach the Lambda
+# without JWT validation. The Lambda function must handle OPTIONS and respond
+# with appropriate CORS headers.
+# 
+# The pattern "OPTIONS /{proxy+}" matches all paths, ensuring preflight works
+# for every endpoint. This route is evaluated before the $default catch-all.
+# ------------------------------------------------------------------------------
+
+resource "aws_apigatewayv2_route" "options" {
+  api_id    = aws_apigatewayv2_api.backend.id
+  route_key = "OPTIONS /{proxy+}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  # No authorization_type: OPTIONS requests bypass JWT validation
 }
 
 # ------------------------------------------------------------------------------
