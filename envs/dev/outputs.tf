@@ -76,3 +76,20 @@ output "lambda_function_name" {
   description = "Name of the backend Lambda function."
   value       = module.backend_api.lambda_function_name
 }
+
+# github_actions_iam outputs
+
+output "github_actions_role_arn" {
+  description = "ARN of the IAM role for GitHub Actions OIDC. Store in GitHub Secrets as GITHUB_ACTIONS_ROLE_ARN."
+  value       = module.github_actions_iam.github_actions_role_arn
+}
+
+output "github_actions_role_name" {
+  description = "Name of the IAM role for GitHub Actions OIDC."
+  value       = module.github_actions_iam.github_actions_role_name
+}
+
+output "github_oidc_provider_arn" {
+  description = "ARN of the GitHub OIDC Identity Provider."
+  value       = module.github_actions_iam.github_oidc_provider_arn
+}

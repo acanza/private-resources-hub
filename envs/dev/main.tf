@@ -136,3 +136,30 @@ module "backend_api" {
 
   tags = var.tags
 }
+
+# ------------------------------------------------------------------------------
+# Module: github_actions_iam
+#
+# Creates an OIDC Identity Provider for GitHub Actions and a least-privilege
+# IAM role. No long-lived credentials are created.
+#
+# Outputs:
+# - github_actions_role_arn: Use in GitHub Actions workflow
+# - github_actions_role_name: Name of the role
+# - github_oidc_provider_arn: ARN of the OIDC provider
+# ------------------------------------------------------------------------------
+
+module "github_actions_iam" {
+  source = "../../modules/github_actions_iam"
+
+  project_name             = var.project_name
+  environment              = var.environment
+  github_repository_owner  = "acanza"
+  github_repository_name   = "private-resources-hub-frontend"
+  github_repository_branch = "main"
+
+  frontend_bucket_arn      = module.frontend_delivery.frontend_bucket_arn
+  frontend_distribution_id = module.frontend_delivery.frontend_distribution_id
+
+  tags = var.tags
+}
