@@ -114,15 +114,11 @@ variable "cors_allowed_origins" {
   description = <<-EOT
     List of origins allowed to call the API from a browser.
     Should include the CloudFront frontend domain and, for dev, localhost.
-    Example: {"prod":["https://d111abcdef.cloudfront.net"], "dev":["http://localhost:3000"]}
+    Example: "[\"https://d111abcdef.cloudfront.net\", \"http://localhost:3000\"]"
     Never set to ["*"] in stage or prod.
   EOT
-  type        = map(list(string))
-
-  validation {
-    condition     = length(var.cors_allowed_origins) > 0
-    error_message = "At least one CORS allowed origin must be provided."
-  }
+  type        = string
+  default     = "[\"http://localhost:5173\"]"
 }
 
 # ------------------------------------------------------------------------------
