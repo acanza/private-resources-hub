@@ -40,3 +40,6 @@ End-to-end flow across frontend and backend applications:
 8. **Secure Content Delivery**: Browser automatically includes the signed cookies in requests to CloudFront. CloudFront validates the signatures and serves content from the private S3 bucket only if signatures are valid and not expired.
 
 9. **Session Management**: Signed URLs and cookies have configurable TTLs. Once expired, users must re-request access through the API, ensuring continuous authorization checks.
+
+## Notes
+As this is a personal project focused on serverless architecture, it does not support user registration or file uploads. Users are restricted to browsing directories and downloading resources for which they have permissions.
